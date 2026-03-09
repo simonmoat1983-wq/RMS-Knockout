@@ -6,313 +6,189 @@
 <style>
 body {
   margin: 0;
+  padding: 0;
+  background: #010b1a; /* very dark blue almost black */
   font-family: Arial, sans-serif;
-  background: #050911;
   color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
+  text-align: center;
 }
-
 h1 {
-  margin-bottom: 10px;
-  color: #00ffff;
-  text-shadow: 0 0 10px #ff33cc, 0 0 20px #00ffff;
+  margin: 20px;
+  color: #00ffff; /* cyan title */
 }
-
-#instructions {
-  margin-bottom: 20px;
-  text-align: center;
-  color: #ff66aa;
-}
-
-#grid {
-  display: grid;
-  grid-template-columns: repeat(4, 100px);
-  grid-gap: 10px;
-  margin-bottom: 20px;
-}
-
-.box {
-  background: white;
-  color: #050911;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  height: 100px;
-  text-align: center;
-  padding: 5px;
-  font-weight: bold;
-  font-size: 14px;
-  transition: transform 0.1s ease, box-shadow 0.2s ease;
-}
-
-.box.selected {
-  border: 3px solid #00ffff;
-}
-
 #playArea {
   position: relative;
-  width: 420px;
-  height: 420px;
+  margin: 20px auto;
+  width: 500px;
+  height: 500px;
+  background: #001a33; /* darker blue */
   border: 3px solid #00ffff;
-  margin-bottom: 20px;
-  background: linear-gradient(135deg,#050911,#001a33);
+  border-radius: 15px;
   overflow: hidden;
 }
-
 .nameTag {
   position: absolute;
-  background: #ffffff;
-  color: #050911;
-  padding: 5px 8px;
-  border-radius: 6px;
+  padding: 5px 10px;
+  background: white;
+  color: #001a33;
   font-weight: bold;
-  text-align: center;
-  font-size: 14px;
-  pointer-events: none;
+  border-radius: 8px;
+  transition: transform 0.2s;
 }
-
-#logo {
-  position: absolute;
-  width: 60px;
-  height: 40px;
-  background: linear-gradient(135deg, #00ffff, #ff33cc);
-  border-radius: 50% / 50%;
-  color: #050911;
-  font-weight: bold;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-shadow: 0 0 5px white;
+#instructions {
+  margin-bottom: 15px;
 }
-
-.particle {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: 0.9;
-}
-
-#winnerScreen {
-  display: none;
-  font-size: 28px;
-  font-weight: bold;
+#winner {
+  font-size: 24px;
   margin-top: 20px;
-  color: #ff33cc;
-  text-shadow: 0 0 10px #00ffff;
+  color: #ff00ff; /* pink winner */
 }
-
 button {
   padding: 10px 20px;
+  margin: 5px;
   font-size: 16px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  margin: 5px;
   background: #00ffff;
-  color: #050911;
-  font-weight: bold;
-  box-shadow: 0 0 10px #ff33cc;
-}
-
-button:hover {
-  background: #ff33cc;
-  color: white;
+  color: #001a33;
 }
 </style>
 </head>
 <body>
 
 <h1>RMS Knockout</h1>
-<div id="instructions">Click a box to add your name. Each player picks a different box. Then press Start!</div>
-
-<div id="grid"></div>
-<button id="startBtn">Start</button>
-
-<div id="playArea">
-  <div id="logo">RMS</div>
+<div id="instructions">Enter names in the boxes below and then press START!</div>
+<div id="grid" style="display:grid; grid-template-columns: repeat(4, 100px); grid-gap: 10px; width: 450px; margin: 0 auto;">
+  <!-- 16 input boxes -->
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
+  <input placeholder="Name" class="box">
 </div>
+<button id="startBtn">START</button>
 
-<div id="winnerScreen"></div>
+<div id="playArea"></div>
+<div id="winner"></div>
 
 <script>
-const gridSize = 16;
-const boxes = [];
-const namesInBox = Array(gridSize).fill(null);
-const nameTags = [];
-const logo = document.getElementById('logo');
-let logoX = 50, logoY = 50;
-let dx = (Math.random() * 3 + 2) * (Math.random() > 0.5 ? 1 : -1);
-let dy = (Math.random() * 3 + 2) * (Math.random() > 0.5 ? 1 : -1);
-let animation;
-
-const gridContainer = document.getElementById('grid');
 const playArea = document.getElementById('playArea');
+const boxes = Array.from(document.querySelectorAll('.box'));
+let namesInBox = [];
+let nameTags = [];
+let logoX = 50, logoY = 50;
+let dx = (Math.random() * 2 + 1) * (Math.random() > 0.5 ? 1 : -1);
+let dy = (Math.random() * 2 + 1) * (Math.random() > 0.5 ? 1 : -1);
+let logoWidth = 60, logoHeight = 40;
+let logoInterval;
+let lastHit = null;
 
-// create 16 boxes for selection
-for (let i = 0; i < gridSize; i++) {
-  const box = document.createElement('div');
-  box.classList.add('box');
-  box.dataset.index = i;
-  box.innerText = '';
-  box.addEventListener('click', () => selectBox(i));
-  gridContainer.appendChild(box);
-  boxes.push(box);
+// Draw logo function
+function drawLogo(ctx, x, y) {
+  ctx.clearRect(0, 0, playArea.clientWidth, playArea.clientHeight);
+  // draw all remaining names
+  nameTags.forEach(tag => {
+    if(tag.parentElement) {
+      tag.style.transform = `translate(0,0)`; // ensure visible
+    }
+  });
+  // draw oval logo
+  ctx.save();
+  ctx.fillStyle = '#ff00ff'; // pink
+  ctx.beginPath();
+  ctx.ellipse(x + logoWidth/2, y + logoHeight/2, logoWidth/2, logoHeight/2, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#001a33';
+  ctx.font = 'bold 16px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('RMS', x + logoWidth/2, y + logoHeight/2);
+  ctx.restore();
 }
 
-function selectBox(index) {
-  const name = prompt("Enter name for this box:");
-  if (!name) return;
-  if (namesInBox[index]) {
-    alert("Box already has a name!");
+// Initialize canvas inside playArea
+const canvas = document.createElement('canvas');
+canvas.width = playArea.clientWidth;
+canvas.height = playArea.clientHeight;
+playArea.appendChild(canvas);
+const ctx = canvas.getContext('2d');
+
+function animateLogo() {
+  logoX += dx;
+  logoY += dy;
+
+  // Bounce off walls
+  if(logoX <=0 || logoX+logoWidth >= playArea.clientWidth) dx *= -1;
+  if(logoY <=0 || logoY+logoHeight >= playArea.clientHeight) dy *= -1;
+
+  // Random direction change
+  if(Math.random() < 0.01) { dx *= -1; dy *= -1; }
+
+  // Check collisions with names
+  nameTags.forEach((tag, idx) => {
+    if(!tag.parentElement) return; // already removed
+    const tagX = parseFloat(tag.style.left);
+    const tagY = parseFloat(tag.style.top);
+    const tagW = tag.offsetWidth;
+    const tagH = tag.offsetHeight;
+
+    if(logoX < tagX + tagW && logoX + logoWidth > tagX &&
+       logoY < tagY + tagH && logoY + logoHeight > tagY) {
+         // Hit detected
+         tag.remove();
+         lastHit = idx;
+    }
+  });
+
+  drawLogo(ctx, logoX, logoY);
+
+  // Check for winner
+  if(nameTags.filter(tag => tag.parentElement).length === 1) {
+    const winnerTag = nameTags.find(tag => tag.parentElement);
+    document.getElementById('winner').innerText = "🏆 Winner: " + winnerTag.innerText;
+    clearInterval(logoInterval);
     return;
   }
-  namesInBox[index] = name;
-  boxes[index].innerText = name;
-  boxes[index].classList.add('selected');
+
+  requestAnimationFrame(animateLogo);
 }
 
+// Start game
 document.getElementById('startBtn').addEventListener('click', () => {
-  if (!namesInBox.some(n => n)) {
-    alert("Add at least one name!");
-    return;
-  }
+  namesInBox = boxes.map(b => b.value).filter(v=>v.trim() !== "");
+  if(namesInBox.length === 0) { alert("Enter at least one name!"); return; }
 
   // hide grid
   document.getElementById('grid').style.display = 'none';
   document.getElementById('startBtn').style.display = 'none';
   document.getElementById('instructions').style.display = 'none';
 
-  // display all names in playArea
-  boxes.forEach((box, i) => {
-    if (namesInBox[i]) {
-      const tag = document.createElement('div');
-      tag.classList.add('nameTag');
-      const boxRect = box.getBoundingClientRect();
-      const playRect = playArea.getBoundingClientRect();
-      tag.style.left = (boxRect.left - playRect.left + boxRect.width/4) + 'px';
-      tag.style.top = (boxRect.top - playRect.top + boxRect.height/4) + 'px';
-      tag.innerText = namesInBox[i];
-      playArea.appendChild(tag);
-      nameTags[i] = tag;
-    }
+  // place names in playArea
+  namesInBox.forEach((name, i) => {
+    const tag = document.createElement('div');
+    tag.classList.add('nameTag');
+    tag.style.left = (20 + (i%4)*100) + 'px';
+    tag.style.top = (20 + Math.floor(i/4)*100) + 'px';
+    tag.innerText = name;
+    playArea.appendChild(tag);
+    nameTags.push(tag);
   });
 
-  // pre-spin effect
-  let spinDegree = 0;
-  let glow = 0;
-  const preAnim = setInterval(() => {
-    spinDegree += 30;
-    glow = glow === 0 ? 15 : 0;
-    logo.style.transform = `rotate(${spinDegree}deg) scale(${1 + glow/30})`;
-  }, 50);
-
-  setTimeout(() => {
-    clearInterval(preAnim);
-    logo.style.transform = 'rotate(0deg) scale(1)';
-    animateLogo();
-  }, 1500);
+  animateLogo();
 });
-
-function animateLogo() {
-  animation = requestAnimationFrame(animateLogo);
-  logoX += dx;
-  logoY += dy;
-
-  // Bounce off walls with jitter
-  if (logoX <= 0 || logoX >= 360) {
-    dx = -dx + (Math.random() - 0.5) * 0.5;
-    dx = Math.max(Math.min(dx, 6), -6);
-  }
-  if (logoY <= 0 || logoY >= 380) {
-    dy = -dy + (Math.random() - 0.5) * 0.5;
-    dy = Math.max(Math.min(dy, 6), -6);
-  }
-
-  logo.style.left = logoX + 'px';
-  logo.style.top = logoY + 'px';
-
-  // check collisions
-  nameTags.forEach((tag, i) => {
-    if (!tag) return;
-    const tagRect = tag.getBoundingClientRect();
-    const playRect = playArea.getBoundingClientRect();
-    const tagX = tagRect.left - playRect.left;
-    const tagY = tagRect.top - playRect.top;
-    const tagW = tagRect.width;
-    const tagH = tagRect.height;
-
-    if (logoX + 60 > tagX && logoX < tagX + tagW &&
-        logoY + 40 > tagY && logoY < tagY + tagH) {
-
-      createParticles(tagX + tagW/2, tagY + tagH/2);
-      flashTag(tag);
-
-      // remove after short delay
-      namesInBox[i] = null;
-      setTimeout(() => { tag.remove(); nameTags[i] = null; }, 200);
-
-      dx = -dx * 1.05;
-      dy = -dy * 1.05;
-
-      checkWinner();
-    }
-  });
-}
-
-function flashTag(tag) {
-  tag.style.transform = 'scale(1.2)';
-  tag.style.boxShadow = '0 0 20px #ff33cc, 0 0 30px #00ffff';
-  setTimeout(() => {
-    tag.style.transform = 'scale(1)';
-    tag.style.boxShadow = '';
-  }, 150);
-}
-
-function createParticles(x, y) {
-  for (let i = 0; i < 8; i++) {
-    const particle = document.createElement('div');
-    particle.classList.add('particle');
-    particle.style.backgroundColor = (Math.random() > 0.5) ? '#00ffff' : '#ff33cc';
-    particle.style.left = x + 'px';
-    particle.style.top = y + 'px';
-    playArea.appendChild(particle);
-
-    const angle = Math.random() * 2 * Math.PI;
-    const speed = 2 + Math.random() * 3;
-    const dxp = Math.cos(angle) * speed;
-    const dyp = Math.sin(angle) * speed;
-    let life = 0;
-
-    function moveParticle() {
-      life++;
-      particle.style.left = parseFloat(particle.style.left) + dxp + 'px';
-      particle.style.top = parseFloat(particle.style.top) + dyp + 'px';
-      if (life < 20) requestAnimationFrame(moveParticle);
-      else particle.remove();
-    }
-    moveParticle();
-  }
-}
-
-function checkWinner() {
-  const remaining = namesInBox.filter(n => n);
-  if (remaining.length === 1) {
-    cancelAnimationFrame(animation);
-    logo.style.display = 'none';
-    document.getElementById('winnerScreen').innerText = `Winner: ${remaining[0]} 🏆`;
-    document.getElementById('winnerScreen').style.display = 'block';
-  }
-}
 </script>
 
 </body>
 </html>
-
