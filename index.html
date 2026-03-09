@@ -5,190 +5,242 @@
 <title>RMS Knockout</title>
 <style>
 body {
-  margin: 0;
-  padding: 0;
-  background: #010b1a; /* very dark blue almost black */
-  font-family: Arial, sans-serif;
+  background: #000010;
   color: white;
+  font-family: Arial, sans-serif;
   text-align: center;
+  margin: 0;
+  padding: 20px;
 }
+
 h1 {
-  margin: 20px;
-  color: #00ffff; /* cyan title */
+  margin-bottom: 20px;
+  color: #00ffff;
+  text-shadow: 2px 2px 5px #ff00ff;
 }
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(4, 130px);
+  grid-gap: 15px;
+  width: 600px;
+  margin: 0 auto 30px auto;
+}
+
+.boxWrapper {
+  position: relative;
+  width: 130px;
+  height: 60px;
+}
+
+.boxNum {
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  font-size: 14px;
+  color: #00ffff;
+  font-weight: bold;
+}
+
+.box {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  border: 2px solid #00ffff;
+  padding: 5px 10px;
+  font-size: 16px;
+  text-align: center;
+  background: #001a33;
+  color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+}
+.box:focus {
+  outline: none;
+  border-color: #ff00ff;
+  box-shadow: 0 0 10px #ff00ff;
+}
+
 #playArea {
   position: relative;
-  margin: 20px auto;
-  width: 500px;
-  height: 500px;
-  background: #001a33; /* darker blue */
-  border: 3px solid #00ffff;
-  border-radius: 15px;
+  margin: 0 auto;
+  width: 600px;
+  height: 400px;
+  background: linear-gradient(135deg, #001a33, #000010);
+  border: 2px solid #00ffff;
+  border-radius: 12px;
   overflow: hidden;
 }
+
 .nameTag {
   position: absolute;
-  padding: 5px 10px;
+  padding: 5px 8px;
+  border-radius: 8px;
   background: white;
   color: #001a33;
   font-weight: bold;
-  border-radius: 8px;
-  transition: transform 0.2s;
+  text-align: center;
+  font-size: 14px;
 }
-#instructions {
-  margin-bottom: 15px;
-}
+
 #winner {
-  font-size: 24px;
   margin-top: 20px;
-  color: #ff00ff; /* pink winner */
+  font-size: 24px;
+  color: #ff00ff;
+  text-shadow: 2px 2px 4px #00ffff;
 }
+
 button {
+  margin: 15px;
   padding: 10px 20px;
-  margin: 5px;
   font-size: 16px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   background: #00ffff;
-  color: #001a33;
+  color: #000020;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+button:hover {
+  background: #ff00ff;
+  color: white;
 }
 </style>
 </head>
 <body>
 
 <h1>RMS Knockout</h1>
-<div id="instructions">Enter names in the boxes below and then press START!</div>
-<div id="grid" style="display:grid; grid-template-columns: repeat(4, 100px); grid-gap: 10px; width: 450px; margin: 0 auto;">
+<p>Type your names in the boxes below and choose your position. Then start the game!</p>
+
+<div id="grid">
   <!-- 16 input boxes -->
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
-  <input placeholder="Name" class="box">
+  <div class="boxWrapper"><span class="boxNum">1</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">2</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">3</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">4</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">5</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">6</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">7</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">8</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">9</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">10</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">11</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">12</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">13</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">14</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">15</span><input class="box" placeholder="Name"></div>
+  <div class="boxWrapper"><span class="boxNum">16</span><input class="box" placeholder="Name"></div>
 </div>
-<button id="startBtn">START</button>
+
+<button id="startBtn">Start Game</button>
 
 <div id="playArea"></div>
 <div id="winner"></div>
 
 <script>
+// Game variables
 const playArea = document.getElementById('playArea');
-const boxes = Array.from(document.querySelectorAll('.box'));
-let namesInBox = [];
+const boxes = document.querySelectorAll('.box');
 let nameTags = [];
 let logoX = 50, logoY = 50;
-let dx = (Math.random() * 2 + 1) * (Math.random() > 0.5 ? 1 : -1);
-let dy = (Math.random() * 2 + 1) * (Math.random() > 0.5 ? 1 : -1);
-let logoWidth = 60, logoHeight = 40;
-let logoInterval;
-let lastHit = null;
+let dx = 2.5, dy = 2.5; // slower speed
+const logoWidth = 80, logoHeight = 50;
 
-// Draw logo function
-function drawLogo(ctx, x, y) {
-  ctx.clearRect(0, 0, playArea.clientWidth, playArea.clientHeight);
-  // draw all remaining names
-  nameTags.forEach(tag => {
-    if(tag.parentElement) {
-      tag.style.transform = `translate(0,0)`; // ensure visible
-    }
-  });
-  // draw oval logo
-  ctx.save();
-  ctx.fillStyle = '#ff00ff'; // pink
+// Create canvas for trails
+let canvas, ctx;
+
+function drawLogo() {
+  // Draw semi-transparent background to leave trail
+  ctx.fillStyle = 'rgba(0, 0, 16, 0.2)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw RMS oval
+  const gradient = ctx.createRadialGradient(logoX+logoWidth/2, logoY+logoHeight/2, 5, logoX+logoWidth/2, logoY+logoHeight/2, logoWidth/2);
+  gradient.addColorStop(0, '#00ffff');
+  gradient.addColorStop(1, '#ff00ff');
+
+  ctx.fillStyle = gradient;
   ctx.beginPath();
-  ctx.ellipse(x + logoWidth/2, y + logoHeight/2, logoWidth/2, logoHeight/2, 0, 0, Math.PI*2);
+  ctx.ellipse(logoX + logoWidth/2, logoY + logoHeight/2, logoWidth/2, logoHeight/2, 0, 0, Math.PI*2);
   ctx.fill();
-  ctx.fillStyle = '#001a33';
-  ctx.font = 'bold 16px Arial';
+
+  // RMS text
+  ctx.fillStyle = '#000020';
+  ctx.font = 'bold 20px Arial';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('RMS', x + logoWidth/2, y + logoHeight/2);
-  ctx.restore();
+  ctx.fillText('RMS', logoX + logoWidth/2, logoY + logoHeight/2);
 }
 
-// Initialize canvas inside playArea
-const canvas = document.createElement('canvas');
-canvas.width = playArea.clientWidth;
-canvas.height = playArea.clientHeight;
-playArea.appendChild(canvas);
-const ctx = canvas.getContext('2d');
+function startGame() {
+  // Remove existing canvas
+  playArea.innerHTML = '';
+  canvas = document.createElement('canvas');
+  canvas.width = playArea.clientWidth;
+  canvas.height = playArea.clientHeight;
+  playArea.appendChild(canvas);
+  ctx = canvas.getContext('2d');
 
-function animateLogo() {
-  logoX += dx;
-  logoY += dy;
-
-  // Bounce off walls
-  if(logoX <=0 || logoX+logoWidth >= playArea.clientWidth) dx *= -1;
-  if(logoY <=0 || logoY+logoHeight >= playArea.clientHeight) dy *= -1;
-
-  // Random direction change
-  if(Math.random() < 0.01) { dx *= -1; dy *= -1; }
-
-  // Check collisions with names
-  nameTags.forEach((tag, idx) => {
-    if(!tag.parentElement) return; // already removed
-    const tagX = parseFloat(tag.style.left);
-    const tagY = parseFloat(tag.style.top);
-    const tagW = tag.offsetWidth;
-    const tagH = tag.offsetHeight;
-
-    if(logoX < tagX + tagW && logoX + logoWidth > tagX &&
-       logoY < tagY + tagH && logoY + logoHeight > tagY) {
-         // Hit detected
-         tag.remove();
-         lastHit = idx;
+  // Collect names and place randomly
+  nameTags = [];
+  boxes.forEach(box => {
+    if(box.value.trim() !== '') {
+      const tag = document.createElement('div');
+      tag.className = 'nameTag';
+      tag.innerText = box.value.trim();
+      tag.style.left = Math.random()*(playArea.clientWidth-100) + 'px';
+      tag.style.top = Math.random()*(playArea.clientHeight-40) + 'px';
+      nameTags.push(tag);
     }
   });
 
-  drawLogo(ctx, logoX, logoY);
-
-  // Check for winner
-  if(nameTags.filter(tag => tag.parentElement).length === 1) {
-    const winnerTag = nameTags.find(tag => tag.parentElement);
-    document.getElementById('winner').innerText = "🏆 Winner: " + winnerTag.innerText;
-    clearInterval(logoInterval);
-    return;
-  }
-
-  requestAnimationFrame(animateLogo);
-}
-
-// Start game
-document.getElementById('startBtn').addEventListener('click', () => {
-  namesInBox = boxes.map(b => b.value).filter(v=>v.trim() !== "");
-  if(namesInBox.length === 0) { alert("Enter at least one name!"); return; }
-
-  // hide grid
+  // Remove input grid during play
   document.getElementById('grid').style.display = 'none';
   document.getElementById('startBtn').style.display = 'none';
-  document.getElementById('instructions').style.display = 'none';
 
-  // place names in playArea
-  namesInBox.forEach((name, i) => {
-    const tag = document.createElement('div');
-    tag.classList.add('nameTag');
-    tag.style.left = (20 + (i%4)*100) + 'px';
-    tag.style.top = (20 + Math.floor(i/4)*100) + 'px';
-    tag.innerText = name;
-    playArea.appendChild(tag);
-    nameTags.push(tag);
-  });
+  // Direction change every 20s
+  setInterval(() => { dx *= -1; dy *= -1; }, 20000);
+
+  function animateLogo() {
+    logoX += dx;
+    logoY += dy;
+
+    if(logoX <=0 || logoX+logoWidth >= playArea.clientWidth) dx *= -1;
+    if(logoY <=0 || logoY+logoHeight >= playArea.clientHeight) dy *= -1;
+
+    // Check collision
+    nameTags.forEach(tag => {
+      if(!tag.parentElement) return;
+      const tagX = parseFloat(tag.style.left);
+      const tagY = parseFloat(tag.style.top);
+      const tagW = tag.offsetWidth;
+      const tagH = tag.offsetHeight;
+
+      if(logoX < tagX + tagW && logoX + logoWidth > tagX &&
+         logoY < tagY + tagH && logoY + logoHeight > tagY) {
+           tag.remove();
+      }
+    });
+
+    // Draw logo with trail
+    drawLogo();
+
+    // Winner
+    const remaining = nameTags.filter(tag => tag.parentElement);
+    if(remaining.length === 1) {
+      const winnerTag = remaining[0];
+      document.getElementById('winner').innerText = "🏆 Winner: " + winnerTag.innerText;
+      return;
+    }
+
+    requestAnimationFrame(animateLogo);
+  }
 
   animateLogo();
-});
-</script>
+}
 
+document.getElementById('startBtn').addEventListener('click', startGame);
+</script>
 </body>
 </html>
+
