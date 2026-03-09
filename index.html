@@ -80,6 +80,7 @@ h1 {
   font-weight: bold;
   text-align: center;
   font-size: 14px;
+  transition: transform 0.1s;
 }
 
 #winner {
@@ -138,42 +139,15 @@ button:hover {
 <div id="winner"></div>
 
 <script>
-// Game variables
 const playArea = document.getElementById('playArea');
 const boxes = document.querySelectorAll('.box');
 let nameTags = [];
 let logoX = 50, logoY = 50;
-let dx = 2.5, dy = 2.5; // slower speed
+let dx = 2.0, dy = 2.0;
 const logoWidth = 80, logoHeight = 50;
-
-// Create canvas for trails
 let canvas, ctx;
 
-function drawLogo() {
-  // Draw semi-transparent background to leave trail
-  ctx.fillStyle = 'rgba(0, 0, 16, 0.2)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Draw RMS oval
-  const gradient = ctx.createRadialGradient(logoX+logoWidth/2, logoY+logoHeight/2, 5, logoX+logoWidth/2, logoY+logoHeight/2, logoWidth/2);
-  gradient.addColorStop(0, '#00ffff');
-  gradient.addColorStop(1, '#ff00ff');
-
-  ctx.fillStyle = gradient;
-  ctx.beginPath();
-  ctx.ellipse(logoX + logoWidth/2, logoY + logoHeight/2, logoWidth/2, logoHeight/2, 0, 0, Math.PI*2);
-  ctx.fill();
-
-  // RMS text
-  ctx.fillStyle = '#000020';
-  ctx.font = 'bold 20px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('RMS', logoX + logoWidth/2, logoY + logoHeight/2);
-}
-
 function startGame() {
-  // Remove existing canvas
   playArea.innerHTML = '';
   canvas = document.createElement('canvas');
   canvas.width = playArea.clientWidth;
@@ -181,25 +155,45 @@ function startGame() {
   playArea.appendChild(canvas);
   ctx = canvas.getContext('2d');
 
-  // Collect names and place randomly
+  // Create name tags inside play area
   nameTags = [];
   boxes.forEach(box => {
     if(box.value.trim() !== '') {
       const tag = document.createElement('div');
       tag.className = 'nameTag';
       tag.innerText = box.value.trim();
-      tag.style.left = Math.random()*(playArea.clientWidth-100) + 'px';
-      tag.style.top = Math.random()*(playArea.clientHeight-40) + 'px';
+      tag.style.left = Math.random() * (playArea.clientWidth - 100) + 'px';
+      tag.style.top = Math.random() * (playArea.clientHeight - 40) + 'px';
       nameTags.push(tag);
+      playArea.appendChild(tag); // append so names are visible
     }
   });
 
-  // Remove input grid during play
   document.getElementById('grid').style.display = 'none';
   document.getElementById('startBtn').style.display = 'none';
 
-  // Direction change every 20s
+  // Change direction every 20 seconds
   setInterval(() => { dx *= -1; dy *= -1; }, 20000);
+
+  function drawLogo() {
+    ctx.fillStyle = 'rgba(0, 0, 16, 0.2)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const gradient = ctx.createRadialGradient(logoX+logoWidth/2, logoY+logoHeight/2, 5, logoX+logoWidth/2, logoY+logoHeight/2, logoWidth/2);
+    gradient.addColorStop(0, '#00ffff');
+    gradient.addColorStop(1, '#ff00ff');
+
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.ellipse(logoX + logoWidth/2, logoY + logoHeight/2, logoWidth/2, logoHeight/2, 0, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = '#000020';
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('RMS', logoX + logoWidth/2, logoY + logoHeight/2);
+  }
 
   function animateLogo() {
     logoX += dx;
@@ -222,14 +216,11 @@ function startGame() {
       }
     });
 
-    // Draw logo with trail
     drawLogo();
 
-    // Winner
     const remaining = nameTags.filter(tag => tag.parentElement);
     if(remaining.length === 1) {
-      const winnerTag = remaining[0];
-      document.getElementById('winner').innerText = "🏆 Winner: " + winnerTag.innerText;
+      document.getElementById('winner').innerText = "🏆 Winner: " + remaining[0].innerText;
       return;
     }
 
@@ -243,4 +234,3 @@ document.getElementById('startBtn').addEventListener('click', startGame);
 </script>
 </body>
 </html>
-
