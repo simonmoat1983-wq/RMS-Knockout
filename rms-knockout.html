@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RMS Knockout</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #050911; /* almost black deep blue */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  h1 {
+    margin-bottom: 10px;
+    color: #00ffff; /* cyan title */
+    text-shadow: 0 0 10px #ff33cc, 0 0 20px #00ffff;
+  }
+
+  #instructions {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #ff66aa; /* pink accent */
+  }
+
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    grid-gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .box {
+    background: white;
+    color: #050911; /* dark blue font */
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 100px;
+    text-align: center;
+    padding: 5px;
+    font-weight: bold;
+    font-size: 14px;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+  }
+
+  .box.selected {
+    border: 3px solid #00ffff;
+  }
+
+  #playArea {
+    position: relative;
+    width: 420px;
+    height: 420px;
+    border: 3px solid #00ffff;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg,#050911,#001a33);
+    overflow: hidden;
+  }
+
+  #logo {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-color: #00ffff;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #ff33cc, 0 0 25px #00ffff;
+  }
+
+  .particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0.9;
+  }
+
+  #winnerScreen {
+    display: none;
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 20px;
+    color: #ff33cc;
+    text-shadow: 0 0 10px #00ffff;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 5px;
+    background: #00ffff;
+    color: #050911;
+    font-weight: bold;
+    box-shadow: 0 0 10px #ff33cc;
+  }
+
+  button:hover {
+    background: #ff33cc;
+    color: white;
+  }
+</style>
+</head>
+<body>
+
+<h1>RMS Knockout</h1>
+<div id="instructions">Click a box to add your name. Each player picks a different box. Then press Start!</div>
+
+<div id="grid"></div>
+
+<button id="startBtn">Start</button>
+
+<div id="playArea">
+  <div id="logo"></div>
+</div>
+
+<div id="winnerScreen"></div>
+
+<script>
+const gridSize = 16;
+const boxes = [];
+const namesInBox = Array(gridSize).fill(null);
+let selectedBox = null;
+let logo = document.getElementById('logo');
+let logoX = 50, logoY = 50;
+let dx = 3, dy = 3;
+let animation;
+
+const gridContainer = document.getElementById('grid');
+
+// create 16 boxes
+for (let i = 0; i < gridSize; i++) {
+  const box = document.createElement('div');
+  box.classList.add('box');
+  box.dataset.index = i;
+  box.innerText = '';
+  box.addEventListener('click', () => selectBox(i));
+  gridContainer.appendChild(box);
+  boxes.push(box);
+}
+
+function selectBox(index) {
+  const name = prompt("Enter name for this box:");
+  if (!name) return;
+  if (namesInBox[index]) {
+    alert("Box already has a name!");
+    return;
+  }
+  namesInBox[index] = name;
+  boxes[index].innerText = name;
+  boxes[index].classList.add('selected');
+}
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  if (!namesInBox.some(n => n)) {
+    alert("Add at least one name!");
+    return;
+  }
+  document.getElementById('grid').style.display = 'none';
+  document.getElementById('startBtn').style.display = 'none';
+  animateLogo();
+});
+
+function animateLogo() {
+  animation = requestAnimationFrame(animateLogo);
+  logoX += dx;
+  logoY += dy;
+
+  if (logoX <= 0 || logoX >= 380) dx = -dx;
+  if (logoY <= 0 || logoY >= 380) dy = -dy;
+
+  logo.style.left = logoX + 'px';
+  logo.style.top = logoY + 'px';
+
+  boxes.forEach((box, i) => {
+    if (!namesInBox[i]) return;
+
+    const boxRect = box.getBoundingClientRect();
+    const playRect = document.getElementById('playArea').getBoundingClientRect();
+    const boxX = boxRect.left - playRect.left;
+    const boxY = boxRect.top - playRect.top;
+    const boxW = boxRect.width;
+    const boxH = boxRect.height;
+
+    if (logoX + 40 > boxX && logoX < boxX + boxW &&
+        logoY + 40 > boxY && logoY < boxY + boxH) {
+
+      // FANCY EFFECTS
+      createParticles(boxX + boxW/2, boxY + boxH/2);
+      flashBox(box);
+
+      namesInBox[i] = null;
+      box.innerText = '';
+      box.classList.remove('selected');
+
+      // bounce effect
+      dx = -dx * 1.05;
+      dy = -dy * 1.05;
+
+      checkWinner();
+    }
+  });
+}
+
+function flashBox(box) {
+  box.style.transform = 'scale(1.2)';
+  box.style.boxShadow = '0 0 20px #ff33cc, 0 0 30px #00ffff';
+  setTimeout(() => {
+    box.style.transform = 'scale(1)';
+    box.style.boxShadow = '';
+  }, 150);
+}
+
+function createParticles(x, y) {
+  for (let i = 0; i < 8; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    particle.style.backgroundColor = (Math.random() > 0.5) ? '#00ffff' : '#ff33cc';
+    particle.style.left = x + 'px';
+    particle.style.top = y + 'px';
+    document.getElementById('playArea').appendChild(particle);
+
+    const angle = Math.random() * 2 * Math.PI;
+    const speed = 2 + Math.random() * 3;
+    const dxp = Math.cos(angle) * speed;
+    const dyp = Math.sin(angle) * speed;
+    let life = 0;
+
+    function moveParticle() {
+      life++;
+      particle.style.left = parseFloat(particle.style.left) + dxp + 'px';
+      particle.style.top = parseFloat(particle.style.top) + dyp + 'px';
+      if (life < 20) {
+        requestAnimationFrame(moveParticle);
+      } else {
+        particle.remove();
+      }
+    }
+    moveParticle();
+  }
+}
+
+function checkWinner() {
+  const remaining = namesInBox.filter(n => n);
+  if (remaining.length === 1) {
+    cancelAnimationFrame(animation);
+    logo.style.display = 'none';
+    document.getElementById('winnerScreen').innerText = `Winner: ${remaining[0]} 🏆`;
+    document.getElementById('winnerScreen').style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
