@@ -4,110 +4,128 @@
 <meta charset="UTF-8">
 <title>RMS Knockout</title>
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #050911; /* almost black deep blue */
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #050911;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
 
-  h1 {
-    margin-bottom: 10px;
-    color: #00ffff; /* cyan title */
-    text-shadow: 0 0 10px #ff33cc, 0 0 20px #00ffff;
-  }
+h1 {
+  margin-bottom: 10px;
+  color: #00ffff;
+  text-shadow: 0 0 10px #ff33cc, 0 0 20px #00ffff;
+}
 
-  #instructions {
-    margin-bottom: 20px;
-    text-align: center;
-    color: #ff66aa; /* pink accent */
-  }
+#instructions {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #ff66aa;
+}
 
-  #grid {
-    display: grid;
-    grid-template-columns: repeat(4, 100px);
-    grid-gap: 10px;
-    margin-bottom: 20px;
-  }
+#grid {
+  display: grid;
+  grid-template-columns: repeat(4, 100px);
+  grid-gap: 10px;
+  margin-bottom: 20px;
+}
 
-  .box {
-    background: white;
-    color: #050911; /* dark blue font */
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    height: 100px;
-    text-align: center;
-    padding: 5px;
-    font-weight: bold;
-    font-size: 14px;
-    transition: transform 0.1s ease, box-shadow 0.2s ease;
-  }
+.box {
+  background: white;
+  color: #050911;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  height: 100px;
+  text-align: center;
+  padding: 5px;
+  font-weight: bold;
+  font-size: 14px;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
 
-  .box.selected {
-    border: 3px solid #00ffff;
-  }
+.box.selected {
+  border: 3px solid #00ffff;
+}
 
-  #playArea {
-    position: relative;
-    width: 420px;
-    height: 420px;
-    border: 3px solid #00ffff;
-    margin-bottom: 20px;
-    background: linear-gradient(135deg,#050911,#001a33);
-    overflow: hidden;
-  }
+#playArea {
+  position: relative;
+  width: 420px;
+  height: 420px;
+  border: 3px solid #00ffff;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg,#050911,#001a33);
+  overflow: hidden;
+}
 
-  #logo {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    background-color: #00ffff;
-    border-radius: 50%;
-    box-shadow: 0 0 15px #ff33cc, 0 0 25px #00ffff;
-  }
+.nameTag {
+  position: absolute;
+  background: #ffffff;
+  color: #050911;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 14px;
+  pointer-events: none;
+}
 
-  .particle {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    pointer-events: none;
-    opacity: 0.9;
-  }
+#logo {
+  position: absolute;
+  width: 60px;
+  height: 40px;
+  background: linear-gradient(135deg, #00ffff, #ff33cc);
+  border-radius: 50% / 50%;
+  color: #050911;
+  font-weight: bold;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 0 5px white;
+}
 
-  #winnerScreen {
-    display: none;
-    font-size: 28px;
-    font-weight: bold;
-    margin-top: 20px;
-    color: #ff33cc;
-    text-shadow: 0 0 10px #00ffff;
-  }
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.9;
+}
 
-  button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin: 5px;
-    background: #00ffff;
-    color: #050911;
-    font-weight: bold;
-    box-shadow: 0 0 10px #ff33cc;
-  }
+#winnerScreen {
+  display: none;
+  font-size: 28px;
+  font-weight: bold;
+  margin-top: 20px;
+  color: #ff33cc;
+  text-shadow: 0 0 10px #00ffff;
+}
 
-  button:hover {
-    background: #ff33cc;
-    color: white;
-  }
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 5px;
+  background: #00ffff;
+  color: #050911;
+  font-weight: bold;
+  box-shadow: 0 0 10px #ff33cc;
+}
+
+button:hover {
+  background: #ff33cc;
+  color: white;
+}
 </style>
 </head>
 <body>
@@ -116,11 +134,10 @@
 <div id="instructions">Click a box to add your name. Each player picks a different box. Then press Start!</div>
 
 <div id="grid"></div>
-
 <button id="startBtn">Start</button>
 
 <div id="playArea">
-  <div id="logo"></div>
+  <div id="logo">RMS</div>
 </div>
 
 <div id="winnerScreen"></div>
@@ -129,15 +146,17 @@
 const gridSize = 16;
 const boxes = [];
 const namesInBox = Array(gridSize).fill(null);
-let selectedBox = null;
-let logo = document.getElementById('logo');
+const nameTags = [];
+const logo = document.getElementById('logo');
 let logoX = 50, logoY = 50;
-let dx = 3, dy = 3;
+let dx = (Math.random() * 3 + 2) * (Math.random() > 0.5 ? 1 : -1);
+let dy = (Math.random() * 3 + 2) * (Math.random() > 0.5 ? 1 : -1);
 let animation;
 
 const gridContainer = document.getElementById('grid');
+const playArea = document.getElementById('playArea');
 
-// create 16 boxes
+// create 16 boxes for selection
 for (let i = 0; i < gridSize; i++) {
   const box = document.createElement('div');
   box.classList.add('box');
@@ -165,9 +184,41 @@ document.getElementById('startBtn').addEventListener('click', () => {
     alert("Add at least one name!");
     return;
   }
+
+  // hide grid
   document.getElementById('grid').style.display = 'none';
   document.getElementById('startBtn').style.display = 'none';
-  animateLogo();
+  document.getElementById('instructions').style.display = 'none';
+
+  // display all names in playArea
+  boxes.forEach((box, i) => {
+    if (namesInBox[i]) {
+      const tag = document.createElement('div');
+      tag.classList.add('nameTag');
+      const boxRect = box.getBoundingClientRect();
+      const playRect = playArea.getBoundingClientRect();
+      tag.style.left = (boxRect.left - playRect.left + boxRect.width/4) + 'px';
+      tag.style.top = (boxRect.top - playRect.top + boxRect.height/4) + 'px';
+      tag.innerText = namesInBox[i];
+      playArea.appendChild(tag);
+      nameTags[i] = tag;
+    }
+  });
+
+  // pre-spin effect
+  let spinDegree = 0;
+  let glow = 0;
+  const preAnim = setInterval(() => {
+    spinDegree += 30;
+    glow = glow === 0 ? 15 : 0;
+    logo.style.transform = `rotate(${spinDegree}deg) scale(${1 + glow/30})`;
+  }, 50);
+
+  setTimeout(() => {
+    clearInterval(preAnim);
+    logo.style.transform = 'rotate(0deg) scale(1)';
+    animateLogo();
+  }, 1500);
 });
 
 function animateLogo() {
@@ -175,34 +226,39 @@ function animateLogo() {
   logoX += dx;
   logoY += dy;
 
-  if (logoX <= 0 || logoX >= 380) dx = -dx;
-  if (logoY <= 0 || logoY >= 380) dy = -dy;
+  // Bounce off walls with jitter
+  if (logoX <= 0 || logoX >= 360) {
+    dx = -dx + (Math.random() - 0.5) * 0.5;
+    dx = Math.max(Math.min(dx, 6), -6);
+  }
+  if (logoY <= 0 || logoY >= 380) {
+    dy = -dy + (Math.random() - 0.5) * 0.5;
+    dy = Math.max(Math.min(dy, 6), -6);
+  }
 
   logo.style.left = logoX + 'px';
   logo.style.top = logoY + 'px';
 
-  boxes.forEach((box, i) => {
-    if (!namesInBox[i]) return;
+  // check collisions
+  nameTags.forEach((tag, i) => {
+    if (!tag) return;
+    const tagRect = tag.getBoundingClientRect();
+    const playRect = playArea.getBoundingClientRect();
+    const tagX = tagRect.left - playRect.left;
+    const tagY = tagRect.top - playRect.top;
+    const tagW = tagRect.width;
+    const tagH = tagRect.height;
 
-    const boxRect = box.getBoundingClientRect();
-    const playRect = document.getElementById('playArea').getBoundingClientRect();
-    const boxX = boxRect.left - playRect.left;
-    const boxY = boxRect.top - playRect.top;
-    const boxW = boxRect.width;
-    const boxH = boxRect.height;
+    if (logoX + 60 > tagX && logoX < tagX + tagW &&
+        logoY + 40 > tagY && logoY < tagY + tagH) {
 
-    if (logoX + 40 > boxX && logoX < boxX + boxW &&
-        logoY + 40 > boxY && logoY < boxY + boxH) {
+      createParticles(tagX + tagW/2, tagY + tagH/2);
+      flashTag(tag);
 
-      // FANCY EFFECTS
-      createParticles(boxX + boxW/2, boxY + boxH/2);
-      flashBox(box);
-
+      // remove after short delay
       namesInBox[i] = null;
-      box.innerText = '';
-      box.classList.remove('selected');
+      setTimeout(() => { tag.remove(); nameTags[i] = null; }, 200);
 
-      // bounce effect
       dx = -dx * 1.05;
       dy = -dy * 1.05;
 
@@ -211,12 +267,12 @@ function animateLogo() {
   });
 }
 
-function flashBox(box) {
-  box.style.transform = 'scale(1.2)';
-  box.style.boxShadow = '0 0 20px #ff33cc, 0 0 30px #00ffff';
+function flashTag(tag) {
+  tag.style.transform = 'scale(1.2)';
+  tag.style.boxShadow = '0 0 20px #ff33cc, 0 0 30px #00ffff';
   setTimeout(() => {
-    box.style.transform = 'scale(1)';
-    box.style.boxShadow = '';
+    tag.style.transform = 'scale(1)';
+    tag.style.boxShadow = '';
   }, 150);
 }
 
@@ -227,7 +283,7 @@ function createParticles(x, y) {
     particle.style.backgroundColor = (Math.random() > 0.5) ? '#00ffff' : '#ff33cc';
     particle.style.left = x + 'px';
     particle.style.top = y + 'px';
-    document.getElementById('playArea').appendChild(particle);
+    playArea.appendChild(particle);
 
     const angle = Math.random() * 2 * Math.PI;
     const speed = 2 + Math.random() * 3;
@@ -239,11 +295,8 @@ function createParticles(x, y) {
       life++;
       particle.style.left = parseFloat(particle.style.left) + dxp + 'px';
       particle.style.top = parseFloat(particle.style.top) + dyp + 'px';
-      if (life < 20) {
-        requestAnimationFrame(moveParticle);
-      } else {
-        particle.remove();
-      }
+      if (life < 20) requestAnimationFrame(moveParticle);
+      else particle.remove();
     }
     moveParticle();
   }
@@ -259,5 +312,7 @@ function checkWinner() {
   }
 }
 </script>
+
 </body>
 </html>
+
