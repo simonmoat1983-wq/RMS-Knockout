@@ -8,7 +8,7 @@
 <style>
 
 body{
-background:#000015;
+background:#000018;
 font-family:Arial;
 text-align:center;
 color:white;
@@ -18,6 +18,7 @@ padding:20px;
 h1{
 color:#00ffff;
 text-shadow:0 0 10px #ff00ff;
+margin-bottom:20px;
 }
 
 #grid{
@@ -26,7 +27,7 @@ grid-template-columns:repeat(4,140px);
 gap:15px;
 width:620px;
 margin:auto;
-margin-bottom:30px;
+margin-bottom:25px;
 }
 
 .boxWrapper{
@@ -37,7 +38,7 @@ position:relative;
 position:absolute;
 top:4px;
 left:6px;
-font-size:14px;
+font-size:13px;
 color:#00ffff;
 font-weight:bold;
 }
@@ -45,7 +46,7 @@ font-weight:bold;
 .box{
 width:140px;
 height:60px;
-border-radius:12px;
+border-radius:10px;
 border:2px solid #00ffff;
 background:#001a33;
 color:white;
@@ -76,7 +77,7 @@ font-size:14px;
 
 button{
 margin:10px;
-padding:10px 18px;
+padding:10px 20px;
 border-radius:8px;
 border:none;
 background:#00ffff;
@@ -97,6 +98,7 @@ text-shadow:0 0 10px #00ffff;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -113,10 +115,12 @@ text-shadow:0 0 10px #00ffff;
 
 <script>
 
-// create 16 input boxes
 const grid=document.getElementById("grid")
+const playArea=document.getElementById("playArea")
 
+// create 16 boxes
 for(let i=1;i<=16;i++){
+
 let wrap=document.createElement("div")
 wrap.className="boxWrapper"
 
@@ -124,29 +128,36 @@ wrap.innerHTML=`
 <span class="boxNum">${i}</span>
 <input class="box" placeholder="Name">
 `
+
 grid.appendChild(wrap)
+
 }
 
 const boxes=document.querySelectorAll(".box")
-const playArea=document.getElementById("playArea")
 
-let nameTags=[]
-let logoX,logoY
-let dx,dy
-let canvas,ctx
+let canvas
+let ctx
+
+let logoX
+let logoY
+
+let dx
+let dy
 
 const logoWidth=80
 const logoHeight=50
+
+let nameTags=[]
 
 function randomDirection(){
 
 const speed=2.5
 
 const dirs=[
-[speed,speed],
-[-speed,speed],
-[speed,-speed],
-[-speed,-speed]
+[speed,speed*1.3],
+[-speed,speed*1.3],
+[speed,-speed*1.3],
+[-speed,-speed*1.3]
 ]
 
 return dirs[Math.floor(Math.random()*dirs.length)]
@@ -160,6 +171,7 @@ playArea.innerHTML=""
 canvas=document.createElement("canvas")
 canvas.width=playArea.clientWidth
 canvas.height=playArea.clientHeight
+
 playArea.appendChild(canvas)
 
 ctx=canvas.getContext("2d")
@@ -167,13 +179,15 @@ ctx=canvas.getContext("2d")
 logoX=canvas.width/2
 logoY=canvas.height/2
 
-const dir=randomDirection()
+let dir=randomDirection()
+
 dx=dir[0]
 dy=dir[1]
 
 nameTags=[]
 
-boxes.forEach(box=>{
+// place names in chosen grid zone
+boxes.forEach((box,index)=>{
 
 if(box.value.trim()!=""){
 
@@ -181,10 +195,20 @@ let tag=document.createElement("div")
 tag.className="nameTag"
 tag.innerText=box.value
 
-tag.style.left=Math.random()*(canvas.width-100)+"px"
-tag.style.top=Math.random()*(canvas.height-40)+"px"
+let col=index%4
+let row=Math.floor(index/4)
+
+let cellW=canvas.width/4
+let cellH=canvas.height/4
+
+let jitterX=Math.random()*50
+let jitterY=Math.random()*30
+
+tag.style.left=(col*cellW+20+jitterX)+"px"
+tag.style.top=(row*cellH+20+jitterY)+"px"
 
 playArea.appendChild(tag)
+
 nameTags.push(tag)
 
 }
@@ -194,58 +218,7 @@ nameTags.push(tag)
 grid.style.display="none"
 document.getElementById("startBtn").style.display="none"
 
-setInterval(()=>{
-
-dx*=-1
-dy*=-1
-
-},20000)
-
 animate()
-
-}
-
-function explosion(x,y){
-
-for(let i=0;i<10;i++){
-
-let spark=document.createElement("div")
-
-spark.style.position="absolute"
-spark.style.width="6px"
-spark.style.height="6px"
-spark.style.background=["#00ffff","#ff00ff","#ffffff"][Math.floor(Math.random()*3)]
-
-spark.style.left=x+"px"
-spark.style.top=y+"px"
-
-spark.style.borderRadius="50%"
-
-playArea.appendChild(spark)
-
-let angle=Math.random()*Math.PI*2
-let speed=3+Math.random()*3
-
-let vx=Math.cos(angle)*speed
-let vy=Math.sin(angle)*speed
-
-let life=30
-
-function animateSpark(){
-
-spark.style.left=parseFloat(spark.style.left)+vx+"px"
-spark.style.top=parseFloat(spark.style.top)+vy+"px"
-
-life--
-
-if(life>0) requestAnimationFrame(animateSpark)
-else spark.remove()
-
-}
-
-animateSpark()
-
-}
 
 }
 
@@ -277,22 +250,79 @@ ctx.fillText("RMS",logoX+40,logoY+25)
 
 }
 
+function explosion(x,y){
+
+for(let i=0;i<12;i++){
+
+let spark=document.createElement("div")
+
+spark.style.position="absolute"
+spark.style.width="6px"
+spark.style.height="6px"
+
+spark.style.background=["#00ffff","#ff00ff","#ffffff"][Math.floor(Math.random()*3)]
+
+spark.style.left=x+"px"
+spark.style.top=y+"px"
+spark.style.borderRadius="50%"
+
+playArea.appendChild(spark)
+
+let angle=Math.random()*Math.PI*2
+let speed=3+Math.random()*3
+
+let vx=Math.cos(angle)*speed
+let vy=Math.sin(angle)*speed
+
+let life=30
+
+function move(){
+
+spark.style.left=parseFloat(spark.style.left)+vx+"px"
+spark.style.top=parseFloat(spark.style.top)+vy+"px"
+
+life--
+
+if(life>0) requestAnimationFrame(move)
+else spark.remove()
+
+}
+
+move()
+
+}
+
+}
+
 function animate(){
 
 logoX+=dx
 logoY+=dy
 
-if(logoX<=0||logoX+logoWidth>=canvas.width)dx*=-1
-if(logoY<=0||logoY+logoHeight>=canvas.height)dy*=-1
+// bounce off walls
+if(logoX<=0||logoX+logoWidth>=canvas.width){
 
+dx*=-1
+dy+=(Math.random()-0.5)*0.5
+
+}
+
+if(logoY<=0||logoY+logoHeight>=canvas.height){
+
+dy*=-1
+dx+=(Math.random()-0.5)*0.5
+
+}
+
+// collision detection
 nameTags.forEach(tag=>{
 
 if(!tag.parentElement)return
 
-const x=parseFloat(tag.style.left)
-const y=parseFloat(tag.style.top)
-const w=tag.offsetWidth
-const h=tag.offsetHeight
+let x=parseFloat(tag.style.left)
+let y=parseFloat(tag.style.top)
+let w=tag.offsetWidth
+let h=tag.offsetHeight
 
 if(
 logoX<x+w &&
@@ -314,7 +344,9 @@ let remaining=nameTags.filter(t=>t.parentElement)
 
 if(remaining.length===1){
 
-document.getElementById("winner").innerText="🏆 Winner: "+remaining[0].innerText
+document.getElementById("winner").innerText=
+"🏆 Winner: "+remaining[0].innerText
+
 return
 
 }
